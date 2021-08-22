@@ -1,37 +1,31 @@
-## Welcome to GitHub Pages
+<h1>corCTF Write-ups</h1>
 
-You can use the [editor on GitHub](https://github.com/TacticalCream/TacticalCream.github.io/edit/main/index.md) to maintain and preview the content for your website in Markdown files.
+<h2>crypto/fibinary</h2>
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+<h3>About the task</h3>
+<h4>Task description</h4>
+<i>Warmup your crypto skills with the superior number system!</i>
+<h4>Task files</h4>
+[enc.py](https://corctf2021-files.storage.googleapis.com/uploads/cbc718b0b14f91af5c231ed0b6091d2336484619d536bce505a34fa27ec90be8/enc.py)   
+[flag.enc](https://corctf2021-files.storage.googleapis.com/uploads/034184c574279b6889c553d222d2f8c8f1725b56f70f9acb4bc716bc7cabf8df/flag.enc)
 
-### Markdown
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+<h4>Task author</h4>
+<i>quintec</i>
+<h4>Task url</h4>
+<i>https://2021.cor.team/challs</i>
 
-```markdown
-Syntax highlighted code block
+<h3>Write-up</h3>
+<h4>Understanding the task</h4>
+After reading the task description and quickly looking at the files we are given
 
-# Header 1
-## Header 2
-### Header 3
 
-- Bulleted
-- List
 
-1. Numbered
-2. List
 
-**Bold** and _Italic_ and `Code` text
 
-[Link](url) and ![Image](src)
-```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
 
-### Jekyll Themes
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/TacticalCream/TacticalCream.github.io/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
 
-### Support or Contact
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+
