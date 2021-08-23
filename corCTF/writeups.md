@@ -112,9 +112,9 @@ These primes where then used as bases to rotate each character in the secret par
 
 ![rot_n in Ghidra](babyrev/Ghidra_babyrev_rotN.jpg)
 
-Personally I did very little to make this auto generated code more readable, since all I was really interested in was the properties of the rotation function. I.e:
+I did very little to make this auto generated code more readable, since all I was really interested in was the properties of the rotation function. I.e:
 * Does the rotation function rotate letters into symbols? [No]
-..* If not, does the function rotate lower-case letters into upper-case letters? [No]
+  * If not, does the function rotate lower-case letters into upper-case letters? [No]
 * Does the function rotate symbols, and if so how? [Does not rotate symbols]
 * Does the function really rotate each character by the amount given to it, or is it trying to fool us? [It really does rotate by the given amount]
 
