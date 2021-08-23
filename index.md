@@ -1,5 +1,5 @@
 # CTF Write-ups
-[corCTF-2021] (/corctf/writeups.md)
+[corCTF 2021](corCTF/writeups.md)
 
 
 
