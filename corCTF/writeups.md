@@ -79,6 +79,7 @@ Running this program decrypts the flag.enc file and returns the flag:
 </details>
 
 
+
 ## rev/babyrev
 
 ### About the task
@@ -174,6 +175,8 @@ corctf{see?_rEv_aint_so_bad}
 </b>
 </details>
 
+
+
 ## crypto/bank
 ### About the task
 **Task description:**
@@ -201,7 +204,7 @@ Since this is a task that relies on using a nc-session it is usually smart to ma
 
 The first thing I noticed was this enticing option to buy the flag from the server. Let's have a look at what it does:
 
-![The result when we attempt to buy a flag](bank/vsCode_buyflag.jpg)
+![The result when we attempt to buy a flag](bank/vsCode_buyFlag.jpg)
 
 From what we can see here it is clear that we need to enter "our bill". By looking around the code some more we will see that *bill* is an array tied to our session.
 

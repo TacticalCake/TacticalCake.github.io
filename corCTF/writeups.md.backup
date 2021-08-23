@@ -79,6 +79,7 @@ Running this program decrypts the flag.enc file and returns the flag:
 </details>
 
 
+
 ## rev/babyrev
 
 ### About the task
@@ -173,6 +174,8 @@ corctf{see?_rEv_aint_so_bad}
 ```
 </b>
 </details>
+
+
 
 ## crypto/bank
 ### About the task
