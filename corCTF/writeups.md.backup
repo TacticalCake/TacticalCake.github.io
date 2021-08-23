@@ -174,3 +174,166 @@ corctf{see?_rEv_aint_so_bad}
 </b>
 </details>
 
+## crypto/bank
+### About the task
+**Task description:**
+*To keep up with the latest trends CoR is introducing a quantum bank for all your secure banking needs. Unfortunately no one on CoR actually knows how quantum computing works, least of all me...*
+```
+nc crypto.be.ax 6005
+```
+
+
+**Task files:**
+[bank.zip](https://corctf2021-files.storage.googleapis.com/uploads/88f854c323bb5c45590c202711634ff1c9d2ab5a71f8da530cbbf7ca4dd2ee3f/bank.zip)
+
+**Task author:**
+*quintec*
+
+**Task url:**
+*https://2021.cor.team/challs*
+
+### Write-up
+Since this is a task that relies on using a nc-session it is usually smart to make a plan for what to do once you actually connect to the server. We are given server.py which seems to be the python file for the server, so analyzing that code should be enough to grant us a good enough understanding of the task.
+
+#### Understanding the program
+
+![This seems to be the main menu](bank/vsCode_mainMenu.jpg)
+
+The first thing I noticed was this enticing option to buy the flag from the server. Let's have a look at what it does:
+
+![The result when we attempt to buy a flag](bank/vsCode_buyflag.jpg)
+
+From what we can see here it is clear that we need to enter "our bill". By looking around the code some more we will see that *bill* is an array tied to our session.
+
+![The implementation of the bill array](bank/vsCode_billDef.jpg)
+
+What line 74 does is it selects a random symbol from the *symbols* array and imput as 50 different elements in the *bill* array. To understand this better we can run the python program in vsCode debugger to view an example of a *bill* array.
+
+![An example of a *bill* array](bank/vsCode_billExample.jpg)
+
+If you were to scroll down in this window you would see that the array *bill* is indeed 50 elements long and only consists of '1','0','+', and '-'.
+
+Now the question is: How do we determine the values of the *bill* array without using a debugger? Well on line 83 it says that we can *work with qubits*, so let us try that and see what options we get.
+
+![What we get when working with qubits](bank/vsCode_workWithQubits.jpg)
+
+Lines 103-133 are blue because I have chosen to collapse (hide) them. This is just to avoid them drawing attention and causing unnecessary confusion.
+
+On line 89 we are given the option to choose what element of the bill to inspect, each element is called a qubit in this program. We are also given the option to measure the qubit on a '1/0 basis' or '+/- basis'. This seems promising, so let us investigate what happens when we choose them.
+
+![](bank/vsCode_measureQubits.jpg)
+
+Both of these options call the function *qubits[].measure()*, so let us have a look at what that function does.
+
+![](bank/vsCode_qubitMeasure.jpg)
+
+On line 32 we can see what happens if we try to measure in the '0/1' basis. Instead of trying to understand the math that goes into this line we are going to use the debugger in vsCode again to examine what happens when you reach this point in the code.
+
+![](bank/vsCode_debugQMeasure01.png)
+
+As shown in the pictures above. If you measure 1 or 0 with the '0/1' basis you are going to get a predictable outcome. Since the random.random() function only returns numbers between 0 and 1, we can also say that the outcomes of measuring 0/1 qubits with the 0/1 basis is also accurate.
+
+However if you measure +/- qubits with the 0/1 basis you have a 50%/50% chance of the measurement returning 0 or 1, so it will not return an accurate measurement. On line 33 and 36 we can also see that when we get a result from the measure function the self.vec variable is changed so that any future measurements also will return the same result. F.ex. if a + qubit is measured with a 0/1 basis and returns 0, then the next time it is measured with a 0/1 basis it will also return 0.
+
+When measurements are made in the +/- basis the same properties apply. 0/1 qubits measured in +/- basis will randomly select an outcome the first time and return that same outcome if they are tested repeatedly with +/- basis.
+
+If you measure a qubit with the wrong basis it will however also mean that when you try to measure it with the correct basis it will randomly select an outcome and change its self.vect value so that it always returns that same outcome. In other words: if a 0/1 qubit is measured with +/- it will no longer be possible to determine if the qubit is 0/1 by doing measurements, even if the right basis is selected afterwards.
+
+So maybe some of the other options from the 'work with qubits' menu can help us solve this problem. There is one option that draws attention on line 100 it says that we can 'verify qubit'. Let us have a look at what this does:
+
+![](bank/vsCode_verifyQubits.jpg)
+
+So it appears that the verify option measures the qubit in the correct basis, and check if the returning value is correct. This means that if you have measured a qubit with the wrong basis and then try to verify it there is a 50/50 chance of it returning 'Qubit successfully verified' or 'Incorrect qubit'. Therefore this verification cannot tell us if we measured correctly, but it could potentially tell us if we measured incorrectly.
+
+#### Solving the task
+
+At this point it is time to start exploring what the other option for handling qubits are. I started out by testing the Hadamard gate at line 96, but quickly figured it does not do anything useful (atleast not when applied once with no other gates in combination). The next gate I examined did however yield interesting results. This was the 'X gate'.
+
+![](bank/vsCode_xGateQubits.jpg)
+
+![](bank/vsCode_xGateDef.jpg)
+
+This seems like 3 really uneventfull lines of code however they hold the key to solving the task. After some structured testing I figured out that by applying the 'X gate' first to an unknown qubit and then trying to verify it the verification will ALWAYS return 'successful' when the qubit has a basis of +/1 and ALWAYS return 'incorrect' when the qubit has a basis of 0/1.
+
+It turns out that the x gate will inverse any qubit that is in the 0/1 basis and not do anything to qubits that are in the +/- basis. Therefore we can now make our tactic for how to reliably find out the value of qubits:
+
+1. Apply an x-gate
+2. Try to verify the qubit
+* If it fails &#8594; apply a new x-gate &#8594; *measure with 0/1 basis*
+* If it succeeds &#8594; *measure with +/- basis*
+
+There are still 50 elements in the array *bill* so I decided to automate the rest of the task with a python program. If you choose to try applying the solution manually you will find that the connection will be by the server after a little while, so you cannot really get all the qubits in "your bill". I used pwntools to control my nc connection and wrote the following python program to get the flag:
+
+```python
+from pwn import *
+
+def findQbit(index):
+    index = str(index)
+    conn.sendline('1'.encode('utf-8'))
+    conn.recvuntil('Please input the index of the qubit you wish to work with:'.encode('utf-8'))
+    conn.sendline(index.encode('utf-8'))
+    conn.recvuntil('> '.encode('utf-8'))
+    conn.sendline('1'.encode('utf-8'))
+    conn.recvuntil('> '.encode('utf-8'))
+    conn.sendline('8'.encode('utf-8'))
+
+    verifyResult = conn.recvline()
+    verifyResult = (verifyResult == b'Qubit successfully verified.\n')
+    qBitResult = -1
+    if (verifyResult):
+        conn.recvuntil('> '.encode('utf-8'))
+        conn.sendline('7'.encode('utf-8'))
+        testResult = conn.recvline()
+        conn.recvuntil('> '.encode('utf-8'))
+        if ('+' in testResult.decode('utf-8')):
+            qBitResult = '+'
+        else:
+            if('-' in testResult.decode('utf-8')):
+                qBitResult = '-'
+    else:
+        conn.recvuntil('> '.encode('utf-8'))
+        conn.sendline('1'.encode('utf-8'))
+        conn.recvuntil('> '.encode('utf-8'))
+        conn.sendline('6'.encode('utf-8'))
+        testResult = conn.recvline()
+        conn.recvuntil('> '.encode('utf-8'))
+        if ('1' in testResult.decode('utf-8')):
+            qBitResult = '1'
+        else:
+            if('0' in testResult.decode('utf-8')):
+                qBitResult = '0'
+
+    conn.sendline('9'.encode('utf-8'))
+    conn.recvuntil('> '.encode('utf-8'))
+
+    return qBitResult
+
+conn = remote('crypto.be.ax',6005)
+
+conn.recvuntil('Would you like an account? (y/n)'.encode('utf-8'))
+conn.sendline('y'.encode('utf-8'))
+conn.recvuntil('> '.encode('utf-8'))
+bill = [-1] *50
+try:
+    for i in range(0,50):
+        bill[i] = findQbit(i)
+except EOFError:
+    print(conn.recvall)
+
+conn.sendline('2'.encode('utf-8'))
+conn.recvuntil('Enter your bill:'.encode('utf-8'))
+conn.sendline(("".join(bill)).encode('utf-8'))
+print(conn.recvline().decode('utf-8'))
+conn.close()
+```
+
+This program might seeem daunting at first, but most of the lines are just sending or receiving data over the nc-connection. The only real logic in this program is exactly the tactic I described above.
+
+<details>
+<summary> Flag </summary>
+
+```
+corctf{4lw4ys_d3str0y_y0ur_f4k3s}
+```
+
+</details>
