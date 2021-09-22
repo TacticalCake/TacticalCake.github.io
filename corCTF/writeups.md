@@ -127,11 +127,8 @@ Now looking at the code in the main() function again on line 57-62. We can see t
 <details>
 <summary> check: </summary>
 
-![Value of check in Ghidra](babyrev/Ghidra_babyrev_check.jpg)
-```
-check = {0x5f,0x40,0x5a,0x15,0x75,0x45,0x62,0x53,0x75,0x46,0x52,0x43,0x5f, 0x75,0x50,0x52,0x75,0x5f,0x5c,0x4f}
-```
-
+<img src="babyrev/Ghidra_babyrev_check.jpg" alt="Value of check in Ghidra">
+<pre>check = {0x5f,0x40,0x5a,0x15,0x75,0x45,0x62,0x53,0x75,0x46,0x52,0x43,0x5f, 0x75,0x50,0x52,0x75,0x5f,0x5c,0x4f}</pre>
 </details>
 
 Before trying to decrypt these values however it is important to note line 57 in the main() function, where each byte in *check* is transformed the memfrob() function. The [memfrob()](https://linux.die.net/man/3/memfrob#:~:text=The%20memfrob()%20function%20encrypts,on%20the%20encrypted%20memory%20area.) function does an XOR by 42 on each byte in an array or character in a string. Since this happens before the comparison between the *flagSecret* variable and the *check* variable we need to apply this tranformation to the values in *check* to get the encrypted part of the flag. To do this I used [Cyberchef](https://gchq.github.io/CyberChef/) to do a new [XOR by 42 on all the bytes in *check*](https://gchq.github.io/CyberChef/#recipe=From_Hex('0x%20with%20comma')XOR(%7B'option':'Decimal','string':'42'%7D,'Standard',false)To_Hex('0x%20with%20comma',0)&input=MHg1ZiwweDQwLDB4NWEsMHgxNSwweDc1LDB4NDUsMHg2MiwweDUzLDB4NzUsMHg0NiwweDUyLDB4NDMsMHg1ZiwgMHg3NSwweDUwLDB4NTIsMHg3NSwweDVmLDB4NWMsMHg0Zg):
@@ -169,12 +166,7 @@ for n in range(len(check)):
 Which leaves us with the flag:
 <details>
 <summary> Flag: </summary>
-<b> 
-
-```
-corctf{see?_rEv_aint_so_bad}
-```
-</b>
+	<pre><b>corctf{see?_rEv_aint_so_bad}</b></pre>
 </details>
 
 ---
@@ -336,11 +328,7 @@ This program might seeem daunting at first, but most of the lines are just sendi
 
 <details>
 <summary> Flag </summary>
-
-```
-corctf{4lw4ys_d3str0y_y0ur_f4k3s}
-```
-
+	<pre><b>corctf{4lw4ys_d3str0y_y0ur_f4k3s}</b></pre>
 </details>
 
 ---
